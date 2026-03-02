@@ -48,9 +48,9 @@ const Navbar: React.FC = () => {
                 </span>
               )}
             </button>
-            <Link to="/dashboard">
+            {/* <Link to="/dashboard">
               <User className="w-5 h-5 hover:text-[#D4AF37] transition-colors cursor-pointer" />
-            </Link>
+            </Link> */}
 
             <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

@@ -16,8 +16,10 @@ import image6 from '../assets/image6.jpeg';
 const Home: React.FC = () => {
   const [newArrivals, setNewArrivals] = useState(MOCK_PRODUCTS.slice(0, 4));
   const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 100);
     const fetchLatestArrivals = async () => {
       try {
         const { data, error } = await supabase
@@ -38,14 +40,52 @@ const Home: React.FC = () => {
     };
 
     fetchLatestArrivals();
+    return () => clearTimeout(t);
   }, []);
 
   return (
     <div className="bg-[#09090b]">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@1,900&display=swap');
+
+        .font-bebas  { font-family: 'Bebas Neue', sans-serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+
+        /* Gold vertical bar */
+        .gold-bar {
+          transform: scaleY(0);
+          transform-origin: top;
+          transition: transform 1.2s cubic-bezier(0.16,1,0.3,1) 0.3s;
+        }
+        .hero-loaded .gold-bar { transform: scaleY(1); }
+
+        /* Staggered reveals */
+        .r1 { opacity:0; transform:translateY(36px); transition:opacity .9s cubic-bezier(.16,1,.3,1) .4s,transform .9s cubic-bezier(.16,1,.3,1) .4s; }
+        .r2 { opacity:0; transform:translateY(36px); transition:opacity .9s cubic-bezier(.16,1,.3,1) .58s,transform .9s cubic-bezier(.16,1,.3,1) .58s; }
+        .r3 { opacity:0; transform:translateX(-16px); transition:opacity .8s cubic-bezier(.16,1,.3,1) .78s,transform .8s cubic-bezier(.16,1,.3,1) .78s; }
+        .r100 { opacity:0; transform:translateY(16px); transition:opacity .8s cubic-bezier(.16,1,.3,1) .96s,transform .8s cubic-bezier(.16,1,.3,1) .96s; }
+        .r5 { opacity:0; transform:translateX(28px); transition:opacity 1s cubic-bezier(.16,1,.3,1) .7s,transform 1s cubic-bezier(.16,1,.3,1) .7s; }
+        .r7 { opacity:0; transition:opacity .8s 1.2s; }
+
+        .hero-loaded .r1,
+        .hero-loaded .r2,
+        .hero-loaded .r3,
+        .hero-loaded .r100,
+        .hero-loaded .r5,
+        .hero-loaded .r7 {
+          opacity:1 !important;
+          transform:none !important;
+        }
+
+        .outline-text {
+          -webkit-text-stroke: 1.5px rgba(255,255,255,0.4);
+          color: transparent;
+        }
+      `}</style>
+
       {/* Hero Section */}
-      {/* Hero Section */}
-      <section className="relative  h-[70vh] lg:h-screen flex items-center justify-center overflow-hidden bg-[#09090b]">
-        <div className="absolute inset-0">
+      <section className={`relative min-h-[85vh] py-[20px] lg:min-h-screen flex items-center overflow-hidden bg-[#080808] ${loaded ? "hero-loaded" : ""}`}>
+        <div className="absolute inset-0 z-0">
           <Carousel
             showArrows={false}
             showStatus={false}
@@ -65,33 +105,87 @@ const Home: React.FC = () => {
                 <img
                   src={img}
                   alt={`Hero Background ${index + 1}`}
-                  className="w-full h-full object-cover opacity-60"
+                  className="w-full h-full object-cover opacity-50"
                 />
               </div>
             ))}
           </Carousel>
           {/* Enhanced Gradient for Professional Look & Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80 pointer-events-none" />
-          <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-0 bg-black/40 pointer-events-none z-10" />
         </div>
 
-        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto mt-2 md:mt-4 lg:mt-6  sm:pt-10 md:pt-16 lg:pt-20  md:pb-16 lg:pb-20">
-          <span className="text-[#D4AF37] font-black tracking-[0.5em] text-[10px] md:text-xs uppercase mb-4 block animate-pulse drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">GOHARDREPUBLIC — THE MOVEMENT</span>
-          <h1 className="text-4xl md:text-7xl font-heading font-black tracking-tighter mb-2 leading-[0.9] uppercase text-white drop-shadow-2xl">
-            BORN FROM <br />
-            <span className="text-zinc-500/70 outline-text italic">THE GRIND.</span><br />
-            CHASE <span className="text-[#D4AF37]">GREATNESS.</span>
-          </h1>
-          <p className="text-zinc-300 max-w-2xl mx-auto mt-4 text-xs md:text-sm leading-relaxed mb-8 font-black uppercase tracking-[0.2em] italic opacity-95 drop-shadow-lg">
-            "The name Gohard came from the grind — from days when nothing came easy, but giving up was never an option. It’s more than a word; it’s a lifestyle."
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5 lg:gap-6">
-            <Link to="/shop" className="bg-[#D4AF37] hover:bg-[#C9A84C] text-black font-black px-8 md:px-10 lg:px-12 py-4 md:py-5 lg:py-6 tracking-[0.4em] text-[10px] md:text-xs w-full sm:w-auto transition-all transform hover:scale-105 uppercase text-center shadow-2xl shadow-[#D4AF37]/40">
-              Shop Collection
-            </Link>
-            <Link to="/about" className="bg-zinc-900/50 backdrop-blur-sm border-2 border-zinc-700 hover:border-white text-white font-black px-8 md:px-10 lg:px-12 py-4 md:py-5 lg:py-6 tracking-[0.4em] text-[10px] md:text-xs w-full sm:w-auto transition-all uppercase text-center shadow-2xl">
-              Our Manifesto
-            </Link>
+        {/* Animated left gold bar */}
+        <div className="gold-bar absolute left-0 top-0 bottom-0 w-[2px] z-20"
+          style={{ background: "linear-gradient(to bottom, transparent, #D4AF37 30%, #D4AF37 70%, transparent)" }} />
+
+        {/* Corner accent bracket */}
+        <div className="r7 absolute top-10 right-10 w-20 h-20 border-t border-r border-[#D4AF37]/30 z-20" />
+
+        {/* ── Main grid ── */}
+        <div className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pt-20">
+
+          {/* LEFT column */}
+          <div className="space-y-10">
+            {/* Eyebrow line + label */}
+            <div className="r1 flex items-center gap-4">
+              <div className="w-12 h-px bg-[#D4AF37] flex-shrink-0" />
+              <span className="text-[#D4AF37] text-[10px] font-black tracking-[0.5em] uppercase">
+                GOHARDREPUBLIC — THE MOVEMENT
+              </span>
+            </div>
+
+            {/* Headline */}
+            <div>
+              <span className="r1 font-bebas block text-[clamp(4.5rem,12vw,9rem)] leading-[0.85] tracking-tight text-white uppercase">
+                BORN FROM
+              </span>
+              <span className="r2 font-playfair block text-[clamp(3rem,9vw,7rem)] leading-[0.9] italic font-black text-[#D4AF37]">
+                The Grind.
+              </span>
+              <span className="r1 font-bebas block text-[clamp(3.5rem,10vw,8rem)] leading-[0.85] tracking-tight text-white mt-2 uppercase">
+                CHASE <span className="outline-text">GREATNESS.</span>
+              </span>
+            </div>
+
+            {/* Description Quote style */}
+            <div className="r3 border-l-2 border-[#D4AF37] pl-8 max-w-xl">
+              <p className="font-playfair italic text-zinc-300 text-sm md:text-base leading-[1.8] tracking-wide">
+                "The name Gohard came from the grind — from days when nothing came easy, but giving up was never an option. It’s more than a word; it’s a lifestyle."
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="r100 flex flex-col sm:flex-row items-center gap-6 pt-4">
+              <Link to="/shop" className="bg-[#D4AF37] hover:bg-[#C9A84C] text-black font-black px-12 py-5 tracking-[0.4em] text-[10px] w-full sm:w-auto transition-all transform hover:scale-105 uppercase text-center shadow-2xl shadow-[#D4AF37]/40 ring-1 ring-[#D4AF37]/20">
+                Shop Collection
+              </Link>
+              <Link to="/about" className="bg-zinc-900/50 backdrop-blur-md border border-zinc-700 hover:border-[#D4AF37] text-white font-black px-12 py-5 tracking-[0.4em] text-[10px] w-full sm:w-auto transition-all uppercase text-center hover:bg-zinc-800">
+                Our Manifesto
+              </Link>
+            </div>
+          </div>
+
+          {/* RIGHT column — decorative */}
+          <div className="r5 hidden lg:flex justify-end items-center">
+            <div className="flex flex-col items-end gap-6">
+              <span
+                className="font-bebas leading-none select-none pointer-events-none text-right opacity-10"
+                style={{ fontSize: "clamp(5rem,11vw,10rem)", color: "#D4AF37" }}
+              >
+                ELITE<br />ACTIVE
+              </span>
+              <div
+                className="px-10 py-6 text-right backdrop-blur-md border"
+                style={{
+                  background: "rgba(212,175,55,0.05)",
+                  borderColor: "rgba(212,175,55,0.15)"
+                }}
+              >
+                <p className="text-[#D4AF37] text-[10px] font-black tracking-[0.4em] uppercase mb-2 italic">Standard Edition</p>
+                <p className="font-playfair italic text-white text-3xl font-black">No compromise.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
