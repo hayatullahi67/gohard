@@ -11,7 +11,12 @@ const Footer: React.FC = () => {
           <div className="space-y-8">
             <div className="">
               <Link to="/" className="">
-                <img src={logo} alt="GOHARDREPUBLIC" className="h-12 md:h-[150px] w-[150px] " />
+                <img
+                  src={logo}
+                  alt="GOHARDREPUBLIC"
+                  className="h-[120px] w-[120px] object-contain"
+                  style={{ filter: 'brightness(0) invert(1)' }}
+                />
               </Link>
             </div>
             <p className="text-zinc-100 text-sm leading-relaxed max-w-xs font-medium italic">
@@ -29,7 +34,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-4 text-zinc-100 text-sm font-bold tracking-widest uppercase">
               <li><Link to="/shop" className="hover:text-white transition-colors">The Collection</Link></li>
               <li><Link to="/about" className="hover:text-white transition-colors">The Manifesto</Link></li>
-              <li><Link to="/dashboard" className="hover:text-white transition-colors">Brand Admin</Link></li>
+              {/* <li><Link to="/dashboard" className="hover:text-white transition-colors">Brand Admin</Link></li> */}
               <li><a href="#" className="hover:text-white transition-colors">The Community</a></li>
             </ul>
           </div>
@@ -61,7 +66,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="pt-12 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[10px] text-white font-black uppercase tracking-widest">© 2024 GOHARDREPUBLIC. ALL RIGHTS RESERVED.</p>
+          <p className="text-[10px] text-white font-black uppercase tracking-widest">© 2025 GOHARDREPUBLIC. ALL RIGHTS RESERVED.</p>
           <div className="flex space-x-8 text-[10px] text-white font-black uppercase tracking-widest">
             <a href="#" className="hover:text-[#D4AF37] transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-[#D4AF37] transition-colors">Terms of Service</a>

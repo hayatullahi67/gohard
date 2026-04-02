@@ -15,7 +15,12 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
             <Link to="/" className="flex items-center group">
-              <img src={logo} alt="GOHARDREPUBLIC" className="h-12 md:h-[150px] w-[150px] " />
+              <img
+                src={logo}
+                alt="GOHARDREPUBLIC"
+                className="h-[120px] w-[120px] object-contain"
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
             </Link>
           </div>
 
