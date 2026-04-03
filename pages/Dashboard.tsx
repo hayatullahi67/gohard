@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import logo from '../assets/logo.jpeg';
+import logo from '../assets/logo2.jpeg';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
 import { MOCK_PRODUCTS } from '../constants';
@@ -461,7 +461,24 @@ const Dashboard: React.FC = () => {
       </div>
       <div className="bg-zinc-950 border border-zinc-900">
         {orders.map(order => (
-          <div key={order.id} className="p-6 border-b border-zinc-900 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-zinc-900/10 transition-colors">
+          <div
+            key={order.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              setSelectedOrder(order);
+              setIsOrderModalOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedOrder(order);
+                setIsOrderModalOpen(true);
+              }
+            }}
+            className="p-6 border-b border-zinc-900 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-zinc-900/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/60 focus:ring-offset-0"
+            aria-label={`Open order ${order.id}`}
+          >
             <div className="flex items-center space-x-6">
               <div className="text-center bg-zinc-900 p-2 min-w-[60px] border border-zinc-800">
                 <p className="text-[8px] font-bold text-zinc-500 uppercase tracking-tighter">ORDER</p>
@@ -488,15 +505,9 @@ const Dashboard: React.FC = () => {
                 <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Date</p>
                 <p className="text-[10px] font-bold">{new Date(order.created_at).toLocaleDateString()}</p>
               </div>
-              <button
-                onClick={() => {
-                  setSelectedOrder(order);
-                  setIsOrderModalOpen(true);
-                }}
-                className="text-white bg-zinc-900 border border-zinc-800 p-2 hover:border-[#D4AF37] transition-colors rounded-sm"
-              >
-                <Search className="w-4 h-4" />
-              </button>
+              <div className="text-[9px] font-black uppercase tracking-widest text-zinc-600 hidden md:block">
+                View details
+              </div>
             </div>
           </div>
         ))}
