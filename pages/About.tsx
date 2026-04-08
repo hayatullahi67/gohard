@@ -221,15 +221,15 @@ const About: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 text-center">
             <div className="p-10 border border-[#D4AF37]/20 bg-black/40 backdrop-blur-sm group hover:border-[#D4AF37] transition-colors duration-500">
-              <span className="text-[#D4AF37] font-black text-xs tracking-widest block mb-4">01</span>
+              <span className="text-[#D4AF37] font-black text-xs tracking-widest block mb-4">I</span>
               <h4 className="font-heading font-black text-xl uppercase tracking-tighter">THE BOLD</h4>
             </div>
             <div className="p-10 border border-[#D4AF37]/20 bg-black/40 backdrop-blur-sm group hover:border-[#D4AF37] transition-colors duration-500">
-              <span className="text-[#D4AF37] font-black text-xs tracking-widest block mb-4">02</span>
+              <span className="text-[#D4AF37] font-black text-xs tracking-widest block mb-4">II</span>
               <h4 className="font-heading font-black text-xl uppercase tracking-tighter">THE REAL</h4>
             </div>
             <div className="p-10 border border-[#D4AF37]/20 bg-black/40 backdrop-blur-sm group hover:border-[#D4AF37] transition-colors duration-500">
-              <span className="text-[#D4AF37] font-black text-xs tracking-widest block mb-4">03</span>
+              <span className="text-[#D4AF37] font-black text-xs tracking-widest block mb-4">III</span>
               <h4 className="font-heading font-black text-xl uppercase tracking-tighter text-nowrap">THE RELENTLESS</h4>
             </div>
           </div>
@@ -287,15 +287,15 @@ const About: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center items-start">
             <div className="space-y-4">
-              <span className="text-[#D4AF37] font-black text-[10px] tracking-[0.4em] uppercase block mb-2">01</span>
+              <span className="text-[#D4AF37] font-black text-[10px] tracking-[0.4em] uppercase block mb-2">I</span>
               <h3 className="text-2xl font-heading font-black uppercase tracking-tighter">IT’S A FAMILY.</h3>
             </div>
             <div className="space-y-4">
-              <span className="text-[#D4AF37] font-black text-[10px] tracking-[0.4em] uppercase block mb-2">02</span>
+              <span className="text-[#D4AF37] font-black text-[10px] tracking-[0.4em] uppercase block mb-2">II</span>
               <h3 className="text-2xl font-heading font-black uppercase tracking-tighter text-nowrap">IT’S A STATEMENT.</h3>
             </div>
             <div className="space-y-4">
-              <span className="text-[#D4AF37] font-black text-[10px] tracking-[0.4em] uppercase block mb-2">03</span>
+              <span className="text-[#D4AF37] font-black text-[10px] tracking-[0.4em] uppercase block mb-2">III</span>
               <h3 className="text-2xl font-heading font-black uppercase tracking-tighter italic text-nowrap">IT’S GOHARDREPUBLIC.</h3>
             </div>
           </div>

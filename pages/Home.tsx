@@ -3,15 +3,9 @@ import { Link } from 'react-router-dom';
 import { MOCK_PRODUCTS } from '../constants';
 import ProductCard from '../components/ProductCard';
 import { ArrowRight, Zap, Shield, Trophy, Flame } from 'lucide-react';
-import { Carousel } from 'react-responsive-carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { supabase } from '../lib/supabase';
-import image1 from '../assets/image1.jpeg';
-import image2 from '../assets/image2.jpeg';
-import image3 from '../assets/image3.jpeg';
+import gohardBg from '../assets/gohard.png';
 import image4 from '../assets/image4.jpeg';
-import image5 from '../assets/image5.jpeg';
-import image6 from '../assets/image6.jpeg';
 
 const Home: React.FC = () => {
   const [newArrivals, setNewArrivals] = useState(MOCK_PRODUCTS.slice(0, 4));
@@ -86,30 +80,11 @@ const Home: React.FC = () => {
       {/* Hero Section */}
       <section className={`relative min-h-[85vh] py-[20px] lg:min-h-screen flex items-center overflow-hidden bg-[#080808] ${loaded ? "hero-loaded" : ""}`}>
         <div className="absolute inset-0 z-0">
-          <Carousel
-            showArrows={false}
-            showStatus={false}
-            showIndicators={false}
-            showThumbs={false}
-            infiniteLoop={true}
-            autoPlay={true}
-            interval={5000}
-            stopOnHover={false}
-            swipeable={false}
-            emulateTouch={false}
-            transitionTime={1500}
-            className="h-full w-full"
-          >
-            {[image1, image3, image4, image2, image5, image6].map((img, index) => (
-              <div key={index} className="h-full w-full">
-                <img
-                  src={img}
-                  alt={`Hero Background ${index + 1}`}
-                  className="w-full h-full object-cover opacity-50"
-                />
-              </div>
-            ))}
-          </Carousel>
+          <img
+            src={gohardBg}
+            alt="Gohard background"
+            className="w-full h-full object-cover opacity-50"
+          />
           {/* Enhanced Gradient for Professional Look & Text Readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent pointer-events-none z-10" />
           <div className="absolute inset-0 bg-black/40 pointer-events-none z-10" />
@@ -293,9 +268,6 @@ const Home: React.FC = () => {
       </section>
 
       <style>{`
-        .carousel-root, .carousel, .slider-wrapper, .slider {
-          height: 100% !important;
-        }
         @keyframes marquee {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
