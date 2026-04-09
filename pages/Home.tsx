@@ -79,7 +79,7 @@ const Home: React.FC = () => {
       `}</style>
 
       {/* Hero Section */}
-      <section className={`relative min-h-[85vh] py-[20px] lg:min-h-screen flex items-center overflow-hidden bg-[#080808] ${loaded ? "hero-loaded" : ""}`}>
+      <section className={`relative min-h-[85vh] py-[20px] lg:min-h-screen flex items-center overflow-hidden ${loaded ? "hero-loaded" : ""}`}>
         <div className="absolute inset-0 z-0">
           <picture>
             <source media="(max-width: 767px)" srcSet={gohardMobileBg} />
@@ -90,8 +90,8 @@ const Home: React.FC = () => {
             />
           </picture>
           {/* Enhanced Gradient for Professional Look & Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent pointer-events-none z-10" />
-          <div className="absolute inset-0 bg-black/40 pointer-events-none z-10" />
+          <div className="md:absolute md:inset-0 md:bg-gradient-to-r md:from-black md:via-black/40 md:to-transparent md:pointer-events-none md:z-10" />
+          <div className="md:absolute md:inset-0 md:bg-black/40 md:pointer-events-none md:z-10" />
         </div>
 
         {/* Animated left gold bar */}
