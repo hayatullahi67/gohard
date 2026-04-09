@@ -5,6 +5,7 @@ import ProductCard from '../components/ProductCard';
 import { ArrowRight, Zap, Shield, Trophy, Flame } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import gohardBg from '../assets/gohard.png';
+import gohardMobileBg from '../assets/gohard22.jpeg';
 import image4 from '../assets/image4.jpeg';
 
 const Home: React.FC = () => {
@@ -80,11 +81,14 @@ const Home: React.FC = () => {
       {/* Hero Section */}
       <section className={`relative min-h-[85vh] py-[20px] lg:min-h-screen flex items-center overflow-hidden bg-[#080808] ${loaded ? "hero-loaded" : ""}`}>
         <div className="absolute inset-0 z-0">
-          <img
-            src={gohardBg}
-            alt="Gohard background"
-            className="w-full h-full object-cover opacity-50"
-          />
+          <picture>
+            <source media="(max-width: 767px)" srcSet={gohardMobileBg} />
+            <img
+              src={gohardBg}
+              alt="Gohard background"
+              className="w-full h-full object-cover opacity-50"
+            />
+          </picture>
           {/* Enhanced Gradient for Professional Look & Text Readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent pointer-events-none z-10" />
           <div className="absolute inset-0 bg-black/40 pointer-events-none z-10" />

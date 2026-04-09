@@ -27,6 +27,21 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+const normalizeStatus = (status?: string) => {
+  const normalized = (status || 'pending').toLowerCase();
+  return normalized === 'canceled' ? 'cancelled' : normalized;
+};
+const formatStatus = (status?: string) => {
+  const normalized = normalizeStatus(status);
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+};
+const STATUS_OPTIONS = [
+  { value: 'pending', label: 'Pending', dbValue: 'Pending' },
+  { value: 'shipped', label: 'Shipped', dbValue: 'Shipped' },
+  { value: 'delivered', label: 'Delivered', dbValue: 'Delivered' },
+  { value: 'cancelled', label: 'Cancelled', dbValue: 'Cancelled' },
+];
+
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -459,12 +474,21 @@ const Dashboard: React.FC = () => {
           ))}
         </div>
       </div>
-      <div className="bg-zinc-950 border border-zinc-900">
-        {orders.map(order => (
-          <div
-            key={order.id}
-            role="button"
-            tabIndex={0}
+        <div className="bg-zinc-950 border border-zinc-900">
+          {orders.map(order => {
+            const normalizedStatus = normalizeStatus(order.status);
+            const statusLabel = formatStatus(order.status);
+            const statusClass =
+              normalizedStatus === 'shipped' || normalizedStatus === 'delivered'
+                ? 'bg-emerald-600/10 text-emerald-600 border-emerald-600/20'
+                : normalizedStatus === 'cancelled'
+                  ? 'bg-red-600/10 text-red-500 border-red-600/20'
+                  : 'bg-yellow-600/10 text-yellow-600 border-yellow-600/20';
+            return (
+            <div
+              key={order.id}
+              role="button"
+              tabIndex={0}
             onClick={() => {
               setSelectedOrder(order);
               setIsOrderModalOpen(true);
@@ -492,15 +516,12 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-8 w-full md:w-auto justify-between">
-              <div className="flex flex-col items-start md:items-center">
-                <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Status</p>
-                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 border ${order.status === 'shipped'
-                  ? 'bg-emerald-600/10 text-emerald-600 border-emerald-600/20'
-                  : 'bg-yellow-600/10 text-yellow-600 border-yellow-600/20'
-                  }`}>
-                  {order.status || 'Pending'}
-                </span>
-              </div>
+                <div className="flex flex-col items-start md:items-center">
+                  <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Status</p>
+                  <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 border ${statusClass}`}>
+                    {statusLabel}
+                  </span>
+                </div>
               <div className="flex flex-col items-start md:items-center">
                 <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Date</p>
                 <p className="text-[10px] font-bold">{new Date(order.created_at).toLocaleDateString()}</p>
@@ -508,9 +529,10 @@ const Dashboard: React.FC = () => {
               <div className="text-[9px] font-black uppercase tracking-widest text-zinc-600 hidden md:block">
                 View details
               </div>
+              </div>
             </div>
-          </div>
-        ))}
+            );
+          })}
         {orders.length === 0 && (
           <div className="p-20 text-center">
             <p className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.3em]">Fulfillment Queue Empty.</p>
@@ -813,21 +835,32 @@ const Dashboard: React.FC = () => {
             setIsOrderModalOpen(false);
             setSelectedOrder(null);
           }}
-          onStatusUpdate={async (newStatus: string) => {
-            if (!selectedOrder) return;
-            const { error } = await supabase
-              .from('orders')
-              .update({ status: newStatus })
-              .eq('id', selectedOrder.id);
+            onStatusUpdate={async (newStatus: string) => {
+              if (!selectedOrder) return;
+              const normalizedStatus = normalizeStatus(newStatus);
+              const statusOption = STATUS_OPTIONS.find(o => o.value === normalizedStatus) || STATUS_OPTIONS[0];
+              const { data, error } = await supabase
+                .from('orders')
+                .update({ status: statusOption.dbValue })
+                .eq('id', selectedOrder.id)
+                .select('id, status');
 
-            if (error) {
-              alert('Failed to update status');
-            } else {
-              setOrders(orders.map(o => o.id === selectedOrder.id ? { ...o, status: newStatus } : o));
-              setSelectedOrder({ ...selectedOrder, status: newStatus });
-            }
-          }}
-        />
+              if (error) {
+                console.error('Order status update failed:', error);
+                alert(`Failed to update status: ${error.message}`);
+                return;
+              }
+              if (!data || data.length === 0) {
+                console.warn('No rows updated. Check RLS/policies or ID match.');
+                alert('No rows updated. Check Supabase RLS/policies or the order ID.');
+                return;
+              } else {
+                const updatedStatus = (data && Array.isArray(data) && data[0]?.status) ? data[0].status : statusOption.dbValue;
+                setOrders(orders.map(o => o.id === selectedOrder.id ? { ...o, status: updatedStatus } : o));
+                setSelectedOrder({ ...selectedOrder, status: updatedStatus });
+              }
+            }}
+          />
       )}
 
       {/* Mobile Sidebar Overlay */}
@@ -1219,6 +1252,8 @@ const OrderDetailsModal: React.FC<{
   onStatusUpdate: (status: string) => void;
 }> = ({ isOpen, order, onClose, onStatusUpdate }) => {
   if (!order) return null;
+  const normalizedStatus = normalizeStatus(order.status);
+  const statusLabel = formatStatus(order.status);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -1232,9 +1267,13 @@ const OrderDetailsModal: React.FC<{
           <div>
             <div className="flex items-center gap-3 mb-2">
               <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.3em]">Operational Intel</span>
-              <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 border ${order.status === 'Shipped' ? 'bg-emerald-600/10 text-emerald-600 border-emerald-600/20' : 'bg-yellow-600/10 text-yellow-600 border-yellow-600/20'
+              <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 border ${normalizedStatus === 'shipped' || normalizedStatus === 'delivered'
+                ? 'bg-emerald-600/10 text-emerald-600 border-emerald-600/20'
+                : normalizedStatus === 'cancelled'
+                  ? 'bg-red-600/10 text-red-500 border-red-600/20'
+                  : 'bg-yellow-600/10 text-yellow-600 border-yellow-600/20'
                 }`}>
-                {order.status}
+                {statusLabel}
               </span>
             </div>
             <h2 className="text-3xl font-heading font-black tracking-tighter uppercase text-white italic">Order #GHR-{order.id.substring(0, 8)}</h2>
@@ -1291,16 +1330,16 @@ const OrderDetailsModal: React.FC<{
               <section>
                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-6 pb-2 border-b border-zinc-900">Operational Controls</h3>
                 <div className="flex flex-wrap gap-3">
-                  {['Pending', 'Shipped', 'Delivered', 'Cancelled'].map((status) => (
+                  {STATUS_OPTIONS.map((status) => (
                     <button
-                      key={status}
-                      onClick={() => onStatusUpdate(status)}
-                      className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${order.status === status
+                      key={status.value}
+                      onClick={() => onStatusUpdate(status.value)}
+                      className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border transition-all ${normalizedStatus === status.value
                         ? 'bg-[#D4AF37] border-[#D4AF37] text-black'
                         : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700'
                         }`}
                     >
-                      Set {status}
+                      Set {status.label}
                     </button>
                   ))}
                 </div>
