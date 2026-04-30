@@ -23,9 +23,14 @@ import {
   TrendingUp,
   ArrowUpRight,
   MoreVertical,
-  Menu
+  Menu,
+  ReceiptText,
+  Eye,
+  Download
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { downloadReceiptPdf, ReceiptOrder } from '../lib/receipt';
+import ReceiptPreviewModal from '../components/ReceiptPreviewModal';
 
 const normalizeStatus = (status?: string) => {
   const normalized = (status || 'pending').toLowerCase();
@@ -1251,6 +1256,7 @@ const OrderDetailsModal: React.FC<{
   onClose: () => void;
   onStatusUpdate: (status: string) => void;
 }> = ({ isOpen, order, onClose, onStatusUpdate }) => {
+  const [receiptPreviewOrder, setReceiptPreviewOrder] = useState<ReceiptOrder | null>(null);
   if (!order) return null;
   const normalizedStatus = normalizeStatus(order.status);
   const statusLabel = formatStatus(order.status);
@@ -1344,6 +1350,30 @@ const OrderDetailsModal: React.FC<{
                   ))}
                 </div>
               </section>
+
+              <section>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-6 pb-2 border-b border-zinc-900">Receipt Generator</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setReceiptPreviewOrder(order)}
+                    className="bg-[#D4AF37] border border-[#D4AF37] text-black px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-white flex items-center justify-center gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View PDF
+                  </button>
+                  <button
+                    onClick={() => downloadReceiptPdf(order, 'admin')}
+                    className="bg-zinc-900 border border-zinc-800 text-zinc-300 px-4 py-3 text-[10px] font-black uppercase tracking-widest transition-all hover:border-[#D4AF37] hover:text-white flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download PDF
+                  </button>
+                </div>
+                <p className="text-[9px] text-zinc-600 uppercase font-black tracking-widest leading-relaxed mt-3 flex items-center gap-2">
+                  <ReceiptText className="w-3 h-3 text-[#D4AF37]" />
+                  PDF includes buyer, delivery, items, total, and status.
+                </p>
+              </section>
             </div>
 
             {/* Right Column: Order Items */}
@@ -1387,6 +1417,11 @@ const OrderDetailsModal: React.FC<{
           <p className="text-[8px] font-black text-zinc-700 uppercase tracking-[0.5em]">GOHARDREPUBLIC SECURE FULFILLMENT SYSTEMS v2.0</p>
         </div>
       </div>
+      <ReceiptPreviewModal
+        order={receiptPreviewOrder}
+        audience="admin"
+        onClose={() => setReceiptPreviewOrder(null)}
+      />
     </div>
   );
 };

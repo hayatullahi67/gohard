@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { X, Trash2, Plus, Minus, ArrowRight, User, MapPin, Phone, MessageSquare } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ArrowRight, User, MessageSquare, ReceiptText, Eye, Download } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import PaystackPayment from './PaystackPayment';
+import { downloadReceiptPdf, ReceiptOrder } from '../lib/receipt';
+import ReceiptPreviewModal from './ReceiptPreviewModal';
 
 
 const CartDrawer: React.FC = () => {
@@ -19,6 +21,8 @@ const CartDrawer: React.FC = () => {
         email: ''
     });
     const [isPaymentReady, setIsPaymentReady] = useState(false);
+    const [receiptOrder, setReceiptOrder] = useState<ReceiptOrder | null>(null);
+    const [previewOrder, setPreviewOrder] = useState<ReceiptOrder | null>(null);
 
 
     if (!isCartOpen) return null;
@@ -45,6 +49,20 @@ const CartDrawer: React.FC = () => {
                 .select();
 
             if (orderError) throw orderError;
+            const createdOrder = {
+                customer_name: formData.fullName,
+                email: formData.email,
+                phone: formData.phone,
+                whatsapp: formData.whatsapp,
+                address: formData.address,
+                state: formData.state,
+                total_amount: totalPrice,
+                status: 'Paid',
+                items: cart,
+                created_at: new Date().toISOString(),
+                ...(orderData?.[0] || {}),
+                payment_reference: reference?.reference || reference?.trxref || reference?.transaction,
+            };
 
             // 2. Reduce stock for each item in Supabase
             for (const item of cart) {
@@ -70,9 +88,8 @@ const CartDrawer: React.FC = () => {
                 if (updateError) console.error(`Update stock error for ${item.name}:`, updateError);
             }
 
-            alert('ORDER SUCCESSFUL! Payment confirmed.');
+            setReceiptOrder(createdOrder);
             clearCart();
-            setIsCartOpen(false);
             setShowCheckout(false);
             setIsPaymentReady(false);
         } catch (error: any) {
@@ -114,7 +131,45 @@ const CartDrawer: React.FC = () => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    {!showCheckout ? (
+                    {receiptOrder ? (
+                        <div className="h-full flex flex-col items-center justify-center text-center space-y-6 animate-fade-in">
+                            <div className="w-20 h-20 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-full flex items-center justify-center">
+                                <ReceiptText className="w-9 h-9 text-[#D4AF37]" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.4em] mb-3">Payment Confirmed</p>
+                                <h3 className="text-2xl font-heading font-black uppercase italic tracking-tight text-white">Receipt Ready</h3>
+                                <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-3 leading-relaxed">
+                                    Your GOHARDREPUBLIC receipt has been generated. Print it or download a copy for your records.
+                                </p>
+                            </div>
+                            <div className="w-full space-y-3">
+                                <button
+                                    onClick={() => setPreviewOrder(receiptOrder)}
+                                    className="w-full bg-[#D4AF37] text-black font-black py-4 uppercase text-xs tracking-[0.25em] flex items-center justify-center gap-2 hover:bg-white transition-all"
+                                >
+                                    <Eye className="w-4 h-4" />
+                                    View PDF Receipt
+                                </button>
+                                <button
+                                    onClick={() => downloadReceiptPdf(receiptOrder, 'customer')}
+                                    className="w-full bg-zinc-900 border border-zinc-800 text-white font-black py-4 uppercase text-xs tracking-[0.25em] flex items-center justify-center gap-2 hover:border-[#D4AF37] transition-all"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    Download PDF
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setReceiptOrder(null);
+                                        setIsCartOpen(false);
+                                    }}
+                                    className="w-full text-zinc-600 font-black text-[10px] uppercase tracking-widest hover:text-white transition-colors"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    ) : !showCheckout ? (
                         <>
                             {cart.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
@@ -267,13 +322,19 @@ const CartDrawer: React.FC = () => {
                     )}
                 </div>
 
+                <ReceiptPreviewModal
+                    order={previewOrder}
+                    audience="customer"
+                    onClose={() => setPreviewOrder(null)}
+                />
+
                 <div className="p-6 bg-black border-t border-zinc-900 space-y-4">
                     <div className="flex justify-between items-center">
                         <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 italic">Total Loadout</span>
                         <span className="text-xl font-heading font-black text-white italic">₦{totalPrice.toLocaleString()}</span>
                     </div>
 
-                    {cart.length > 0 && !isPaymentReady && (
+                    {cart.length > 0 && !isPaymentReady && !receiptOrder && (
                         <div className="w-full">
                             <button
                                 disabled={loading}
@@ -292,7 +353,7 @@ const CartDrawer: React.FC = () => {
                         </div>
                     )}
 
-                    {showCheckout && (
+                    {showCheckout && !receiptOrder && (
                         <button
                             onClick={() => {
                                 setShowCheckout(false);
